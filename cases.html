@@ -988,7 +988,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
         (c.desc?'<p class="cg-card__cap">'+c.desc+'</p>':'');
       if(isAdmin()){
         var tools=document.createElement('div'); tools.className='cg-card__tools';
-        var eb=document.createElement('button'); eb.type='button'; eb.textContent='수정'; eb.onclick=function(){ openInfo(c); };
+        var eb=document.createElement('button'); eb.type='button'; eb.textContent='수정'; eb.onclick=function(){ if(window.__openEditor) window.__openEditor(c); };
         var db=document.createElement('button'); db.type='button'; db.textContent='삭제'; db.onclick=function(){ delCase(c); };
         tools.appendChild(eb); tools.appendChild(db); el.appendChild(tools);
       }
@@ -1023,11 +1023,11 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
 
 /* editor */
 (function(){
-  var OUT_W=1200,ratio=1.3333,count=2,showLabel=true,panes=[],selected=null;
+  var OUT_W=1200,ratio=1.3333,count=2,showLabel=true,panes=[],selected=null,editingCase=null;
   function filt(s){ return 'brightness('+s.bright+') contrast('+s.contrast+') saturate(1.03)'; }
   var stage=document.getElementById('stage'),editor=document.getElementById('editor');
   var lastComposite=null,lastFilename='';
-  document.getElementById('adminFab').onclick=function(){ resetEditor(); editor.classList.add('open'); setTimeout(relayoutAll,50); };
+  document.getElementById('adminFab').onclick=function(){ resetEditor(); editingCase=null; var t0=document.querySelector('.cg-ed__bar h3'); if(t0) t0.textContent='새 사례 만들기'; editor.classList.add('open'); setTimeout(relayoutAll,50); };
   document.getElementById('edClose').onclick=function(){ editor.classList.remove('open'); };
   editor.addEventListener('click',function(e){ if(e.target===editor) editor.classList.remove('open'); });
   function defaultLabel(i,n){ if(i===0)return'Before'; if(i===n-1)return'After'; return''; }
@@ -1045,6 +1045,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
     function draw(){ var c=canvas.getContext('2d'); c.setTransform(2,0,0,2,0,0); c.clearRect(0,0,st.vw,st.vh); if(!st.img)return; c.filter=filt(st); c.drawImage(st.img,st.ox,st.oy,st.img.width*st.scale,st.img.height*st.scale); c.filter='none'; }
     function setImg(img){ st.img=img; st.baseScale=cover(); st.scale=st.baseScale; st.ox=(st.vw-img.width*st.scale)/2; st.oy=(st.vh-img.height*st.scale)/2; range.value=100; el.classList.add('filled'); draw(); refresh(); sel(P); }
     function load(f){ if(!f||!/^image\//.test(f.type))return; var u=URL.createObjectURL(f),img=new Image(); img.onload=function(){ setImg(img); URL.revokeObjectURL(u); }; img.src=u; }
+    P.loadURL=function(url){ if(!url)return; var img=new Image(); img.crossOrigin='anonymous'; img.onload=function(){ setImg(img); }; img.onerror=function(){ var i2=new Image(); i2.onload=function(){ setImg(i2); }; i2.src=url; }; img.src=url; };
     P.clear=function(){ st.img=null; el.classList.remove('filled'); el.classList.remove('sel'); range.value=100; st.bright=1.05; st.contrast=1.05; draw(); refresh(); if(selected===P) sel(null); };
     el.querySelector('.pick').onclick=function(e){ e.stopPropagation(); fileInput.click(); };
     fileInput.onchange=function(){ if(fileInput.files[0]) load(fileInput.files[0]); };
@@ -1098,39 +1099,66 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
   function blobToB64(b){ return new Promise(function(res){ var r=new FileReader(); r.onload=function(){ res(r.result.split(',')[1]); }; r.readAsDataURL(b); }); }
   function encB64(s){ return btoa(unescape(encodeURIComponent(s))); }
   function decB64(b){ return decodeURIComponent(escape(atob((b||'').replace(/\n/g,'')))); }
+  function caseFirstImg(c){ return (c&&c.photos&&c.photos[0]&&c.photos[0].image)||(c&&c.img)||''; }
   function publishCase(){
     var ni=window.netlifyIdentity, u=ni&&ni.currentUser();
     if(!u){ if(ni) ni.open('login'); else alert('관리자 로그인이 필요합니다.'); return; }
     if(!ready()) return;
+    var isEdit=!!editingCase, target=editingCase;
     var btn=document.getElementById('publishBtn'), sp=btn.querySelector('span'), orig=sp.textContent;
-    btn.disabled=true; sp.textContent='게시 중…';
+    btn.disabled=true; sp.textContent=isEdit?'수정 중…':'게시 중…';
     var name=document.getElementById('fName').value.trim()||'시술 사례', cat=document.getElementById('fCat').value, desc=document.getElementById('fDesc').value.trim();
-    var api='/.netlify/git/github/contents/';
+    var api='/.netlify/git/github/contents/', aps=active();
     u.jwt().then(function(token){
-      var hdr={Authorization:'Bearer '+token,'Content-Type':'application/json'};
-      var fn='case-'+slug(name)+'-'+Date.now().toString().slice(-6)+'.jpg';
-      return new Promise(function(res){ composite().toBlob(function(b){res(b);},'image/jpeg',0.9); }).then(function(blob){
-        return blobToB64(blob).then(function(b64){
-          return fetch(api+'assets/cases/'+fn,{method:'PUT',headers:hdr,body:JSON.stringify({message:'add image '+fn,content:b64})}).then(function(r1){
-            if(!r1.ok) throw new Error('이미지 업로드 실패('+r1.status+')');
-            return fetch(api+'cases.json',{headers:{Authorization:'Bearer '+token}}).then(function(g){ return g.ok?g.json():null; }).then(function(gj){
-              var data={cases:[]}, sha=null;
-              if(gj){ sha=gj.sha; try{ data=JSON.parse(decB64(gj.content)); }catch(e){} }
-              if(!data.cases) data.cases=[];
-              data.cases.unshift({name:name,cat:cat,desc:desc,img:'/assets/cases/'+fn});
-              var body={message:'add case '+name,content:encB64(JSON.stringify(data,null,2))}; if(sha) body.sha=sha;
-              return fetch(api+'cases.json',{method:'PUT',headers:hdr,body:JSON.stringify(body)}).then(function(r2){
-                if(!r2.ok) throw new Error('목록 저장 실패('+r2.status+')');
-                CASES.unshift({name:name,cat:cat,desc:desc,img:URL.createObjectURL(blob)});
-                window.__renderGallery(); editor.classList.remove('open');
-                alert('게시되었습니다. 1~2분 뒤 사이트에 반영됩니다.');
-              });
+      var hdr={Authorization:'Bearer '+token,'Content-Type':'application/json'}, stamp=Date.now().toString().slice(-6);
+      function up(i,photos){
+        if(i>=aps.length) return Promise.resolve(photos);
+        var p=aps[i], lb=(p.tag.value||'').trim();
+        return new Promise(function(res){ p.render().toBlob(function(b){res(b);},'image/jpeg',0.9); }).then(function(blob){
+          return blobToB64(blob).then(function(b64){
+            var fn='case-'+slug(name)+'-'+stamp+'-'+(i+1)+'.jpg';
+            return fetch(api+'assets/cases/'+fn,{method:'PUT',headers:hdr,body:JSON.stringify({message:'img '+fn,content:b64})}).then(function(r){
+              if(!r.ok) throw new Error('이미지 업로드 실패('+r.status+')');
+              photos.push({image:'/assets/cases/'+fn,label:lb}); return up(i+1,photos);
             });
           });
         });
+      }
+      return up(0,[]).then(function(photos){
+        return fetch(api+'cases.json',{headers:{Authorization:'Bearer '+token}}).then(function(g){ return g.ok?g.json():null; }).then(function(gj){
+          var data={cases:[]}, sha=null;
+          if(gj){ sha=gj.sha; try{ data=JSON.parse(decB64(gj.content)); }catch(e){} }
+          if(!data.cases) data.cases=[];
+          var rec={name:name,cat:cat,desc:desc,photos:photos}, done=false;
+          if(isEdit){ var key=caseFirstImg(target); if(key){ for(var k=0;k<data.cases.length;k++){ if(caseFirstImg(data.cases[k])===key){ data.cases[k]=rec; done=true; break; } } } }
+          if(!done) data.cases.unshift(rec);
+          var body={message:(isEdit?'edit case ':'add case ')+name,content:encB64(JSON.stringify(data,null,2))}; if(sha) body.sha=sha;
+          return fetch(api+'cases.json',{method:'PUT',headers:hdr,body:JSON.stringify(body)}).then(function(r2){
+            if(!r2.ok) throw new Error('목록 저장 실패('+r2.status+')');
+            var localPhotos=aps.map(function(p){ try{ return {image:p.render().toDataURL('image/jpeg',0.85),label:(p.tag.value||'').trim()}; }catch(e){ return {image:'',label:(p.tag.value||'').trim()}; } });
+            var lr={name:name,cat:cat,desc:desc,photos:localPhotos};
+            if(isEdit){ var li=CASES.indexOf(target); if(li>=0) CASES[li]=lr; else CASES.unshift(lr); } else CASES.unshift(lr);
+            window.__renderGallery(); editor.classList.remove('open'); editingCase=null;
+            alert((isEdit?'수정':'게시')+'되었습니다. 1~2분 뒤 사이트에 반영됩니다.');
+          });
+        });
       });
-    }).catch(function(e){ alert('게시 실패: '+(e.message||e)); }).then(function(){ btn.disabled=false; sp.textContent=orig; });
+    }).catch(function(e){ alert((isEdit?'수정':'게시')+' 실패: '+(e.message||e)); }).then(function(){ btn.disabled=false; sp.textContent=orig; });
   }
+  function openEditor(c){
+    resetEditor(); editingCase=c;
+    document.getElementById('fName').value=c.name||''; document.getElementById('fCat').value=c.cat||'botox'; document.getElementById('fDesc').value=c.desc||'';
+    var imgs=[];
+    if(c.photos&&c.photos.length) imgs=c.photos.map(function(p){return {image:p.image,label:p.label||''};});
+    else if(c.img) imgs=[{image:c.img,label:'Before'},{image:c.img,label:'After'}];
+    var n=Math.max(2,Math.min(6,imgs.length||2));
+    count=n; document.querySelectorAll('#countSeg button').forEach(function(b){ b.classList.toggle('on', parseInt(b.getAttribute('data-n'),10)===n); });
+    applyCount();
+    imgs.forEach(function(im,i){ if(i<n && panes[i] && im.image){ panes[i].loadURL(im.image); if(im.label){ panes[i].tag.value=im.label; panes[i].tag.dataset.auto='0'; panes[i].tag.classList.toggle('after',(im.label||'').toLowerCase()==='after'); } } });
+    var t=document.querySelector('.cg-ed__bar h3'); if(t) t.textContent='사례 수정';
+    editor.classList.add('open'); setTimeout(relayoutAll,60);
+  }
+  window.__openEditor=openEditor;
   document.getElementById('publishBtn').onclick=publishCase;
   var _dlUnused=function(){ if(!lastComposite)return; lastComposite.toBlob(function(b){ var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=lastFilename; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},1000); },'image/jpeg',0.9); };
   var _cpUnused=function(){ var t=document.getElementById('snippet').textContent; if(navigator.clipboard) navigator.clipboard.writeText(t); var b=this; b.textContent='복사됨 ✓'; setTimeout(function(){ b.textContent='코드 복사'; },1500); };
@@ -1162,7 +1190,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
     document.getElementById('fName').value=''; document.getElementById('fDesc').value=''; document.getElementById('fCat').selectedIndex=0;
     document.getElementById('labelToggle').checked=true; showLabel=true;
     brightR.value=105; contrastR.value=105;
-    lastComposite=null;
+    lastComposite=null; editingCase=null;
     applyCount(); sel(null);
   }
   function init(){ panes.forEach(function(p){ p.layout(); }); applyCount(); sel(null); }
