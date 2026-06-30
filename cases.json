@@ -1,6 +1,12 @@
 {
   "cases": [
     {
+      "name": "입술 필러",
+      "cat": "filler",
+      "desc": "레스틸렌 키스 0.4cc 시술직후",
+      "img": "/assets/cases/case-입술-필러-124560.jpg"
+    },
+    {
       "name": "시술 사례",
       "cat": "lifting",
       "desc": "마리오네트, 이중턱 리프팅",
