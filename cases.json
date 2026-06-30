@@ -1,6 +1,29 @@
 {
   "cases": [
     {
+      "name": "시술 사례",
+      "cat": "botox",
+      "desc": "",
+      "photos": [
+        {
+          "image": "/assets/cases/case-시술-사례-279258-1.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-시술-사례-279258-2.jpg",
+          "label": "After"
+        },
+        {
+          "image": "/assets/cases/case-시술-사례-279258-3.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-시술-사례-279258-4.jpg",
+          "label": "After"
+        }
+      ]
+    },
+    {
       "name": "입술 필러",
       "cat": "filler",
       "desc": "벨로테로 0.7cc. 시술 직후",
