@@ -2,8 +2,8 @@
   "cases": [
     {
       "name": "시술 사례",
-      "cat": "botox",
-      "desc": "",
+      "cat": "lifting",
+      "desc": "마리오네트, 이중턱 리프팅",
       "img": "/assets/cases/case-시술-사례-733605.jpg"
     }
   ]
