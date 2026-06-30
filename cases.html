@@ -978,21 +978,31 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
       el.innerHTML=media+
         '<div class="cg-card__head"><h3>'+(c.name||'')+'</h3><span class="cat">'+(CAT_LABEL[c.cat]||'기타')+'</span></div>'+
         (c.desc?'<p class="cg-card__cap">'+c.desc+'</p>':'');
-      if(c._editable){
+      if(isAdmin()){
         var tools=document.createElement('div'); tools.className='cg-card__tools';
         var eb=document.createElement('button'); eb.type='button'; eb.textContent='수정'; eb.onclick=function(){ openInfo(c); };
-        var db=document.createElement('button'); db.type='button'; db.textContent='삭제'; db.onclick=function(){ var i=CASES.indexOf(c); if(i>=0){ CASES.splice(i,1); render(); } };
+        var db=document.createElement('button'); db.type='button'; db.textContent='삭제'; db.onclick=function(){ delCase(c); };
         tools.appendChild(eb); tools.appendChild(db); el.appendChild(tools);
       }
       grid.appendChild(el);
     });
   }
   var infoEd=document.getElementById('infoEd'),editing=null;
+  function ni(){ return window.netlifyIdentity; }
+  function isAdmin(){ var n=ni(); return !!(n&&n.currentUser()); }
+  function gApi(){ return '/.netlify/git/github/contents/'; }
+  function gEnc(s){ return btoa(unescape(encodeURIComponent(s))); }
+  function gDec(b){ return decodeURIComponent(escape(atob((b||'').replace(/\n/g,'')))); }
+  function sameCase(a,b){ if(a.img&&b.img) return a.img===b.img; return a.name===b.name&&a.cat===b.cat&&((a.desc||'')===(b.desc||'')); }
+  function gLoad(token){ return fetch(gApi()+'cases.json',{headers:{Authorization:'Bearer '+token}}).then(function(g){ return g.ok?g.json():null; }).then(function(gj){ var data={cases:[]},sha=null; if(gj){ sha=gj.sha; try{data=JSON.parse(gDec(gj.content));}catch(e){} } if(!data.cases)data.cases=[]; return {data:data,sha:sha}; }); }
+  function gSave(token,data,sha,msg){ var body={message:msg,content:gEnc(JSON.stringify(data,null,2))}; if(sha) body.sha=sha; return fetch(gApi()+'cases.json',{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){ if(!r.ok) throw new Error('저장 실패('+r.status+')'); }); }
+  function withToken(fn){ var n=ni(); if(!n||!n.currentUser()){ if(n)n.open('login'); else alert('관리자 로그인이 필요합니다.'); return; } n.currentUser().jwt().then(fn).catch(function(e){ alert('오류: '+(e.message||e)); }); }
+  function delCase(c){ if(!confirm('이 사례를 삭제할까요?')) return; withToken(function(token){ return gLoad(token).then(function(o){ o.data.cases=o.data.cases.filter(function(x){ return !sameCase(x,c); }); return gSave(token,o.data,o.sha,'delete case').then(function(){ var i=CASES.indexOf(c); if(i>=0)CASES.splice(i,1); render(); alert('삭제되었습니다. 1~2분 뒤 반영됩니다.'); }); }); }); }
   function openInfo(c){ editing=c; document.getElementById('iName').value=c.name||''; document.getElementById('iCat').value=c.cat||'etc'; document.getElementById('iDesc').value=c.desc||''; infoEd.classList.add('open'); }
   document.getElementById('infoClose').onclick=function(){ infoEd.classList.remove('open'); };
   infoEd.addEventListener('click',function(e){ if(e.target===infoEd) infoEd.classList.remove('open'); });
-  document.getElementById('iSave').onclick=function(){ if(!editing)return; editing.name=document.getElementById('iName').value.trim()||editing.name; editing.cat=document.getElementById('iCat').value; editing.desc=document.getElementById('iDesc').value.trim(); infoEd.classList.remove('open'); render(); };
-  document.getElementById('iDel').onclick=function(){ if(!editing)return; var i=CASES.indexOf(editing); if(i>=0)CASES.splice(i,1); infoEd.classList.remove('open'); render(); };
+  document.getElementById('iSave').onclick=function(){ if(!editing)return; var nm=document.getElementById('iName').value.trim()||editing.name, ct=document.getElementById('iCat').value, ds=document.getElementById('iDesc').value.trim(); withToken(function(token){ return gLoad(token).then(function(o){ var it=o.data.cases.filter(function(x){return sameCase(x,editing);})[0]; if(it){ it.name=nm; it.cat=ct; it.desc=ds; } return gSave(token,o.data,o.sha,'edit case').then(function(){ editing.name=nm; editing.cat=ct; editing.desc=ds; infoEd.classList.remove('open'); render(); alert('수정되었습니다. 1~2분 뒤 반영됩니다.'); }); }); }); };
+  document.getElementById('iDel').onclick=function(){ if(!editing)return; var c=editing; infoEd.classList.remove('open'); delCase(c); };
   window.__renderGallery=render; render();
   /* C 워크플로우: 배포 사이트에서 cases.json(관리자 CMS가 저장)을 읽어 자동 표시 */
   fetch('cases.json',{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).then(function(d){ if(d&&d.cases&&d.cases.length){ CASES=d.cases.slice(); window.__renderGallery(); } }).catch(function(){});
@@ -1153,7 +1163,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
 <script>
 (function(){
   var fab=document.getElementById('adminFab'), loginLink=document.getElementById('adminLogin');
-  function setAdmin(on){ if(fab) fab.style.display=on?'':'none'; if(loginLink) loginLink.textContent=on?'관리자 로그아웃':'관리자'; }
+  function setAdmin(on){ if(fab) fab.style.display=on?'':'none'; if(loginLink) loginLink.textContent=on?'관리자 로그아웃':'관리자'; if(window.__renderGallery) window.__renderGallery(); }
   setAdmin(false);
   var ni=window.netlifyIdentity;
   if(ni){
