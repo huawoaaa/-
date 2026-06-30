@@ -735,14 +735,14 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .cg-chip{appearance:none;border:1px solid var(--line-normal);background:transparent;color:var(--label-neutral);font-family:inherit;font-size:0.8125rem;font-weight:500;letter-spacing:0.02em;padding:9px 18px;border-radius:999px;cursor:pointer;transition:.15s;white-space:nowrap;}
 .cg-chip:hover{color:var(--label-normal);border-color:var(--label-alternative);}
 .cg-chip.on{background:var(--label-normal);color:#fff;border-color:var(--label-normal);}
-.cg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:56px 40px;}
+.cg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:72px 40px;}
 .cg-card{display:flex;flex-direction:column;position:relative;}
 .cg-card__media{border-radius:12px;overflow:hidden;background:var(--background-alternative);border:1px solid var(--line-solid-normal);}
 .cg-card__media img{width:100%;height:auto;display:block;}
-.cg-card__head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding-bottom:16px;margin:16px 0 0;border-bottom:1px solid var(--line-solid-normal);}
+.cg-card__head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:12px 0 0;}
 .cg-card__head h3{font-size:1.125rem;font-weight:600;letter-spacing:-0.01em;}
 .cg-card__head .cat{font-size:0.6875rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--label-alternative);border:1px solid var(--line-normal);border-radius:6px;padding:4px 9px;white-space:nowrap;}
-.cg-card__cap{margin:14px 0 0;font-size:0.9rem;line-height:1.7;color:var(--label-alternative);}
+.cg-card__cap{margin:7px 0 0;font-size:0.9rem;line-height:1.65;color:var(--label-alternative);}
 .cg-card__tools{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:3;}
 .cg-card__tools button{appearance:none;border:0;background:rgba(23,23,25,.62);color:#fff;font-size:0.72rem;font-weight:600;padding:6px 11px;border-radius:7px;cursor:pointer;font-family:inherit;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
 .cg-card__tools button:hover{background:rgba(23,23,25,.85);}
@@ -754,7 +754,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .cg-empty{grid-column:1/-1;padding:64px 0;text-align:center;color:var(--label-assistive);font-size:0.95rem;line-height:1.9;}
 .cg-disc{margin-top:56px;border:1px solid var(--line-solid-normal);border-radius:12px;padding:22px 26px;font-size:0.8125rem;line-height:1.75;color:var(--label-alternative);background:var(--background-alternative);}
 .cg-disc b{color:var(--label-normal);font-weight:600;}
-@media(max-width:760px){.cg-grid{grid-template-columns:1fr;gap:40px;}}
+@media(max-width:760px){.cg-grid{grid-template-columns:1fr;gap:56px;}}
 
 /* ===== editor overlay ===== */
 .cg-ovl{position:fixed;inset:0;z-index:200;background:rgba(20,20,22,.55);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:32px 16px;}
@@ -934,7 +934,14 @@ html, body { max-width: 100%; overflow-x: hidden; }
     <div class="cg-ed__body">
       <div class="cg-fld grow" style="margin-bottom:16px;"><label>시술명</label><input id="iName" type="text"></div>
       <div class="cg-fld" style="margin-bottom:16px;"><label>카테고리</label><select id="iCat"><option value="botox">보톡스</option><option value="filler">필러</option><option value="lifting">실리프팅</option><option value="pigment">색소치료</option><option value="antiaging">안티에이징</option><option value="etc">기타</option></select></div>
-      <div class="cg-fld grow" style="margin-bottom:20px;"><label>설명</label><input id="iDesc" type="text"></div>
+      <div class="cg-fld grow" style="margin-bottom:18px;"><label>설명</label><input id="iDesc" type="text"></div>
+      <div class="cg-fld grow" style="margin-bottom:20px;"><label>사진 (바꾸려면 새 이미지 선택)</label>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <img id="iImgPrev" alt="" style="width:128px;height:96px;object-fit:cover;border-radius:8px;border:1px solid var(--line-normal);background:var(--background-alternative);">
+          <button class="cg-copy" id="iImgBtn" type="button" style="margin-top:0;">사진 변경</button>
+          <input id="iImgFile" type="file" accept="image/*" hidden>
+        </div>
+      </div>
       <div class="cg-ed__act">
         <button class="wds-btn wds-btn--lg btn-gold" id="iSave" type="button"><span>저장</span></button>
         <button class="wds-btn wds-btn--lg btn-ghost" id="iDel" type="button"><span>삭제</span></button>
@@ -987,7 +994,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
       grid.appendChild(el);
     });
   }
-  var infoEd=document.getElementById('infoEd'),editing=null;
+  var infoEd=document.getElementById('infoEd'),editing=null,editImgFile=null;
   function ni(){ return window.netlifyIdentity; }
   function isAdmin(){ var n=ni(); return !!(n&&n.currentUser()); }
   function gApi(){ return '/.netlify/git/github/contents/'; }
@@ -998,10 +1005,15 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
   function gSave(token,data,sha,msg){ var body={message:msg,content:gEnc(JSON.stringify(data,null,2))}; if(sha) body.sha=sha; return fetch(gApi()+'cases.json',{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){ if(!r.ok) throw new Error('저장 실패('+r.status+')'); }); }
   function withToken(fn){ var n=ni(); if(!n||!n.currentUser()){ if(n)n.open('login'); else alert('관리자 로그인이 필요합니다.'); return; } n.currentUser().jwt().then(fn).catch(function(e){ alert('오류: '+(e.message||e)); }); }
   function delCase(c){ if(!confirm('이 사례를 삭제할까요?')) return; withToken(function(token){ return gLoad(token).then(function(o){ o.data.cases=o.data.cases.filter(function(x){ return !sameCase(x,c); }); return gSave(token,o.data,o.sha,'delete case').then(function(){ var i=CASES.indexOf(c); if(i>=0)CASES.splice(i,1); render(); alert('삭제되었습니다. 1~2분 뒤 반영됩니다.'); }); }); }); }
-  function openInfo(c){ editing=c; document.getElementById('iName').value=c.name||''; document.getElementById('iCat').value=c.cat||'etc'; document.getElementById('iDesc').value=c.desc||''; infoEd.classList.add('open'); }
+  function fileToB64(f){ return new Promise(function(res){ var r=new FileReader(); r.onload=function(){ res(r.result.split(',')[1]); }; r.readAsDataURL(f); }); }
+  function slug2(s){ return (s||'case').trim().replace(/[^\w가-�]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'case'; }
+  function gPutImage(token,fn,b64){ return fetch(gApi()+'assets/cases/'+fn,{method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({message:'replace image '+fn,content:b64})}).then(function(r){ if(!r.ok) throw new Error('이미지 업로드 실패('+r.status+')'); }); }
+  function openInfo(c){ editing=c; editImgFile=null; document.getElementById('iName').value=c.name||''; document.getElementById('iCat').value=c.cat||'etc'; document.getElementById('iDesc').value=c.desc||''; var pv=document.getElementById('iImgPrev'); pv.src=c.img||(c.photos&&c.photos[0]&&c.photos[0].image)||''; infoEd.classList.add('open'); }
+  document.getElementById('iImgBtn').onclick=function(){ document.getElementById('iImgFile').click(); };
+  document.getElementById('iImgFile').onchange=function(){ var f=this.files[0]; if(f&&/^image\//.test(f.type)){ editImgFile=f; document.getElementById('iImgPrev').src=URL.createObjectURL(f); } };
   document.getElementById('infoClose').onclick=function(){ infoEd.classList.remove('open'); };
   infoEd.addEventListener('click',function(e){ if(e.target===infoEd) infoEd.classList.remove('open'); });
-  document.getElementById('iSave').onclick=function(){ if(!editing)return; var nm=document.getElementById('iName').value.trim()||editing.name, ct=document.getElementById('iCat').value, ds=document.getElementById('iDesc').value.trim(); withToken(function(token){ return gLoad(token).then(function(o){ var it=o.data.cases.filter(function(x){return sameCase(x,editing);})[0]; if(it){ it.name=nm; it.cat=ct; it.desc=ds; } return gSave(token,o.data,o.sha,'edit case').then(function(){ editing.name=nm; editing.cat=ct; editing.desc=ds; infoEd.classList.remove('open'); render(); alert('수정되었습니다. 1~2분 뒤 반영됩니다.'); }); }); }); };
+  document.getElementById('iSave').onclick=function(){ if(!editing)return; var nm=document.getElementById('iName').value.trim()||editing.name, ct=document.getElementById('iCat').value, ds=document.getElementById('iDesc').value.trim(); withToken(function(token){ var prep=editImgFile?fileToB64(editImgFile).then(function(b64){ var fn='case-'+slug2(nm)+'-'+Date.now().toString().slice(-6)+'.jpg'; return gPutImage(token,fn,b64).then(function(){ return '/assets/cases/'+fn; }); }):Promise.resolve(null); return prep.then(function(newImg){ return gLoad(token).then(function(o){ var it=o.data.cases.filter(function(x){return sameCase(x,editing);})[0]; if(it){ it.name=nm; it.cat=ct; it.desc=ds; if(newImg){ it.img=newImg; delete it.photos; } } return gSave(token,o.data,o.sha,'edit case').then(function(){ editing.name=nm; editing.cat=ct; editing.desc=ds; if(newImg){ editing.img=newImg; delete editing.photos; } infoEd.classList.remove('open'); render(); alert('수정되었습니다. 1~2분 뒤 반영됩니다.'); }); }); }); }); };
   document.getElementById('iDel').onclick=function(){ if(!editing)return; var c=editing; infoEd.classList.remove('open'); delCase(c); };
   window.__renderGallery=render; render();
   /* C 워크플로우: 배포 사이트에서 cases.json(관리자 CMS가 저장)을 읽어 자동 표시 */
