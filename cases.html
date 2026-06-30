@@ -905,7 +905,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       <div class="cg-fld grow" style="margin-bottom:18px;"><label>설명 (선택)</label><input id="fDesc" type="text" placeholder="예: 씹는 근육을 줄여 갸름한 턱선으로."></div>
       <div class="cg-row" style="margin-bottom:10px;">
         <div class="cg-fld"><label>사진 개수</label>
-          <div class="cg-seg" id="countSeg"><button data-n="2" class="on">2</button><button data-n="3">3</button><button data-n="4">4</button><button data-n="5">5</button><button data-n="6">6</button></div>
+          <div class="cg-seg" id="countSeg"><button data-n="1">1</button><button data-n="2" class="on">2</button><button data-n="3">3</button><button data-n="4">4</button><button data-n="5">5</button><button data-n="6">6</button></div>
         </div>
         <div class="cg-fld"><label>비율</label>
           <div class="cg-seg" id="ratioSeg"><button data-ratio="1.3333" class="on">4:3</button><button data-ratio="1">1:1</button><button data-ratio="0.75">3:4</button></div>
@@ -1030,7 +1030,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
   document.getElementById('adminFab').onclick=function(){ resetEditor(); editingCase=null; var t0=document.querySelector('.cg-ed__bar h3'); if(t0) t0.textContent='새 사례 만들기'; editor.classList.add('open'); setTimeout(relayoutAll,50); };
   document.getElementById('edClose').onclick=function(){ editor.classList.remove('open'); };
   editor.addEventListener('click',function(e){ if(e.target===editor) editor.classList.remove('open'); });
-  function defaultLabel(i,n){ if(i===0)return'Before'; if(i===n-1)return'After'; return''; }
+  function defaultLabel(i,n){ if(n===1)return''; if(i===0)return'Before'; if(i===n-1)return'After'; return''; }
   function colsFor(n){ return n<=3?n:(n===4?2:3); }
   var PANE='<select class="tag"><option>Before</option><option>After</option><option>정면</option><option>측면</option><option>3개월 후</option><option>6개월 후</option><option value="">없음</option></select><button class="rm" type="button">×</button><div class="empty"><span class="big">사진</span><span class="sm">끌어다 놓기</span><button class="pick" type="button">파일 선택</button></div><canvas></canvas><div class="zoom"><button data-fit type="button">맞춤</button><input type="range" min="100" max="320" value="100"><button data-reset type="button">↺</button></div><input type="file" accept="image/*" hidden>';
   for(var i=0;i<6;i++){ var el=document.createElement('div'); el.className='cg-pane'; el.innerHTML=PANE; stage.appendChild(el); panes.push(makePane(el,i)); }
@@ -1150,8 +1150,8 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
     document.getElementById('fName').value=c.name||''; document.getElementById('fCat').value=c.cat||'botox'; document.getElementById('fDesc').value=c.desc||'';
     var imgs=[];
     if(c.photos&&c.photos.length) imgs=c.photos.map(function(p){return {image:p.image,label:p.label||''};});
-    else if(c.img) imgs=[{image:c.img,label:'Before'},{image:c.img,label:'After'}];
-    var n=Math.max(2,Math.min(6,imgs.length||2));
+    else if(c.img) imgs=[{image:c.img,label:''}];
+    var n=Math.max(1,Math.min(6,imgs.length||2));
     count=n; document.querySelectorAll('#countSeg button').forEach(function(b){ b.classList.toggle('on', parseInt(b.getAttribute('data-n'),10)===n); });
     applyCount();
     imgs.forEach(function(im,i){ if(i<n && panes[i] && im.image){ panes[i].loadURL(im.image); if(im.label){ panes[i].tag.value=im.label; panes[i].tag.dataset.auto='0'; panes[i].tag.classList.toggle('after',(im.label||'').toLowerCase()==='after'); } } });
