@@ -1,3 +1,10 @@
 {
-  "cases": []
+  "cases": [
+    {
+      "name": "시술 사례",
+      "cat": "botox",
+      "desc": "",
+      "img": "/assets/cases/case-시술-사례-733605.jpg"
+    }
+  ]
 }
