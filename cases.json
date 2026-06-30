@@ -6,6 +6,29 @@
       "desc": "마리오네트, 이중턱 리프팅",
       "photos": [
         {
+          "image": "/assets/cases/case-실리프팅-116209-1.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-실리프팅-116209-2.jpg",
+          "label": "After"
+        },
+        {
+          "image": "/assets/cases/case-실리프팅-116209-3.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-실리프팅-116209-4.jpg",
+          "label": "After"
+        }
+      ]
+    },
+    {
+      "name": "실리프팅",
+      "cat": "lifting",
+      "desc": "마리오네트, 이중턱 리프팅",
+      "photos": [
+        {
           "image": "/assets/cases/case-실리프팅-503534-1.jpg",
           "label": "Before"
         },
