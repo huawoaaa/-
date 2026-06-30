@@ -820,13 +820,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
 <header class="d-header">
   <div class="wrap wrap-wide d-header__inner">
-    <a class="d-logo" href="home-d.html">마디고운</a>
+    <a class="d-logo" href="index.html">마디고운</a>
     <nav class="d-nav">
-      <a href="home-d.html">홈<span class="ens"> · Home</span></a>
+      <a href="index.html">홈<span class="ens"> · Home</span></a>
       <a href="madi.html">마디<span class="ens"> · Pain</span></a>
       <a href="goun.html">고운<span class="ens"> · Beauty</span></a>
       <a href="cases.html" class="on">사례<span class="ens"> · Cases</span></a>
-      <a href="home-d.html#visit">진료안내<span class="ens"> · Visit</span></a>
+      <a href="index.html#visit">진료안내<span class="ens"> · Visit</span></a>
     </nav>
     <div class="d-utils">
       <a href="tel:062-571-5000">062-571-5000</a>
@@ -883,7 +883,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       <a href="madi.html">마디</a>
       <a href="goun.html">고운</a>
       <a href="cases.html">사례</a>
-      <a href="home-d.html#visit">오시는 길</a>
+      <a href="index.html#visit">오시는 길</a>
       <a href="#" id="adminLogin" style="opacity:.6">관리자</a>
     </div>
   </div>
@@ -922,13 +922,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       <div class="cg-stage" id="stage" style="--cols:2;"></div>
       <p class="cg-ed__hint">칸에 사진을 끌어다 놓기 · <b>칸을 클릭해 선택</b>하면 그 사진의 밝기·대비를 따로 조절 · 드래그로 위치 · 슬라이더로 확대 &nbsp;|&nbsp; <b id="selInfo">선택 안 됨</b></p>
       <div class="cg-ed__act">
-        <button class="wds-btn wds-btn--lg btn-gold" id="makeBtn" disabled><span>사례 코드 만들기</span></button>
-        <button class="wds-btn wds-btn--lg btn-ghost" id="previewBtn" disabled><span>미리보기에 추가</span></button>
-      </div>
-      <div class="cg-out" id="out">
-        <div class="cg-out__s"><span class="n">1</span><b>이미지 저장</b> — 받은 이미지를 프로젝트의 <b>assets/cases/</b> 폴더에 넣으세요.<br><button class="cg-copy" id="dlImg" type="button">⬇ 이미지 다운로드</button></div>
-        <div class="cg-out__s"><span class="n">2</span><b>코드 붙여넣기</b> — 이 페이지의 <code>CASES = [</code> 바로 아래에 붙여넣으세요.<div><code id="snippet"></code></div><button class="cg-copy" id="copyCode" type="button">코드 복사</button></div>
-        <div class="cg-out__s"><span class="n">3</span><b>배포</b> — 저장 후 Netlify에 올리면(재배포) 모두에게 사례가 보입니다.</div>
+        <button class="wds-btn wds-btn--lg btn-gold" id="publishBtn" disabled><span>게시</span></button>
       </div>
     </div>
   </div>
@@ -1058,7 +1052,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
   function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();}
   function active(){ return panes.slice(0,count); }
   function ready(){ return active().every(function(p){ return p.st.img; }); }
-  function refresh(){ var ok=ready(); document.getElementById('makeBtn').disabled=!ok; document.getElementById('previewBtn').disabled=!ok; }
+  function refresh(){ var pb=document.getElementById('publishBtn'); if(pb) pb.disabled=!ready(); }
   function relayoutAll(){ active().forEach(function(p){ p.relayoutKeep(); }); }
   function composite(){
     var cells=active().map(function(p){ return p.render(); });
@@ -1069,7 +1063,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
     return c;
   }
   function slug(s){ return (s||'case').trim().replace(/[^\w가-힣]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase()||'case'; }
-  document.getElementById('makeBtn').onclick=function(){
+  var _mkUnused=function(){
     if(!ready())return;
     var name=document.getElementById('fName').value.trim()||'시술 사례',cat=document.getElementById('fCat').value,desc=document.getElementById('fDesc').value.trim();
     lastComposite=composite();
@@ -1078,9 +1072,46 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
     document.getElementById('out').classList.add('show');
     document.getElementById('out').scrollIntoView({behavior:'smooth',block:'nearest'});
   };
-  document.getElementById('dlImg').onclick=function(){ if(!lastComposite)return; lastComposite.toBlob(function(b){ var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=lastFilename; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},1000); },'image/jpeg',0.9); };
-  document.getElementById('copyCode').onclick=function(){ var t=document.getElementById('snippet').textContent; if(navigator.clipboard) navigator.clipboard.writeText(t); var b=this; b.textContent='복사됨 ✓'; setTimeout(function(){ b.textContent='코드 복사'; },1500); };
-  document.getElementById('previewBtn').onclick=function(){ if(!ready())return; var name=document.getElementById('fName').value.trim()||'시술 사례',cat=document.getElementById('fCat').value,desc=document.getElementById('fDesc').value.trim(); CASES.push({name:name,cat:cat,desc:desc,img:composite().toDataURL('image/jpeg',0.9),_editable:true}); window.__renderGallery(); editor.classList.remove('open'); };
+  function blobToB64(b){ return new Promise(function(res){ var r=new FileReader(); r.onload=function(){ res(r.result.split(',')[1]); }; r.readAsDataURL(b); }); }
+  function encB64(s){ return btoa(unescape(encodeURIComponent(s))); }
+  function decB64(b){ return decodeURIComponent(escape(atob((b||'').replace(/\n/g,'')))); }
+  function publishCase(){
+    var ni=window.netlifyIdentity, u=ni&&ni.currentUser();
+    if(!u){ if(ni) ni.open('login'); else alert('관리자 로그인이 필요합니다.'); return; }
+    if(!ready()) return;
+    var btn=document.getElementById('publishBtn'), sp=btn.querySelector('span'), orig=sp.textContent;
+    btn.disabled=true; sp.textContent='게시 중…';
+    var name=document.getElementById('fName').value.trim()||'시술 사례', cat=document.getElementById('fCat').value, desc=document.getElementById('fDesc').value.trim();
+    var api='/.netlify/git/github/contents/';
+    u.jwt().then(function(token){
+      var hdr={Authorization:'Bearer '+token,'Content-Type':'application/json'};
+      var fn='case-'+slug(name)+'-'+Date.now().toString().slice(-6)+'.jpg';
+      return new Promise(function(res){ composite().toBlob(function(b){res(b);},'image/jpeg',0.9); }).then(function(blob){
+        return blobToB64(blob).then(function(b64){
+          return fetch(api+'assets/cases/'+fn,{method:'PUT',headers:hdr,body:JSON.stringify({message:'add image '+fn,content:b64})}).then(function(r1){
+            if(!r1.ok) throw new Error('이미지 업로드 실패('+r1.status+')');
+            return fetch(api+'cases.json',{headers:{Authorization:'Bearer '+token}}).then(function(g){ return g.ok?g.json():null; }).then(function(gj){
+              var data={cases:[]}, sha=null;
+              if(gj){ sha=gj.sha; try{ data=JSON.parse(decB64(gj.content)); }catch(e){} }
+              if(!data.cases) data.cases=[];
+              data.cases.unshift({name:name,cat:cat,desc:desc,img:'/assets/cases/'+fn});
+              var body={message:'add case '+name,content:encB64(JSON.stringify(data,null,2))}; if(sha) body.sha=sha;
+              return fetch(api+'cases.json',{method:'PUT',headers:hdr,body:JSON.stringify(body)}).then(function(r2){
+                if(!r2.ok) throw new Error('목록 저장 실패('+r2.status+')');
+                CASES.unshift({name:name,cat:cat,desc:desc,img:URL.createObjectURL(blob)});
+                window.__renderGallery(); editor.classList.remove('open');
+                alert('게시되었습니다. 1~2분 뒤 사이트에 반영됩니다.');
+              });
+            });
+          });
+        });
+      });
+    }).catch(function(e){ alert('게시 실패: '+(e.message||e)); }).then(function(){ btn.disabled=false; sp.textContent=orig; });
+  }
+  document.getElementById('publishBtn').onclick=publishCase;
+  var _dlUnused=function(){ if(!lastComposite)return; lastComposite.toBlob(function(b){ var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=lastFilename; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},1000); },'image/jpeg',0.9); };
+  var _cpUnused=function(){ var t=document.getElementById('snippet').textContent; if(navigator.clipboard) navigator.clipboard.writeText(t); var b=this; b.textContent='복사됨 ✓'; setTimeout(function(){ b.textContent='코드 복사'; },1500); };
+  var _pvUnused=function(){ if(!ready())return; var name=document.getElementById('fName').value.trim()||'시술 사례',cat=document.getElementById('fCat').value,desc=document.getElementById('fDesc').value.trim(); CASES.push({name:name,cat:cat,desc:desc,img:composite().toDataURL('image/jpeg',0.9),_editable:true}); window.__renderGallery(); editor.classList.remove('open'); };
   document.getElementById('countSeg').onclick=function(e){ var b=e.target.closest('button'); if(!b)return; this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);}); count=parseInt(b.dataset.n,10); applyCount(); };
   function applyCount(){ stage.style.setProperty('--cols',colsFor(count)); panes.forEach(function(p,i){ var on=i<count; p.el.hidden=!on; if(on){ var dl=defaultLabel(i,count); if(p.tag.dataset.auto!=='0'){ p.tag.value=dl; p.tag.dataset.auto='1'; } p.tag.classList.toggle('after',p.tag.value.trim().toLowerCase()==='after'); } }); requestAnimationFrame(relayoutAll); refresh(); }
   document.getElementById('ratioSeg').onclick=function(e){ var b=e.target.closest('button'); if(!b)return; this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);}); ratio=parseFloat(b.dataset.ratio); panes.forEach(function(p){ p.el.style.aspectRatio=ratio; }); requestAnimationFrame(relayoutAll); };
@@ -1108,7 +1139,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
     document.getElementById('fName').value=''; document.getElementById('fDesc').value=''; document.getElementById('fCat').selectedIndex=0;
     document.getElementById('labelToggle').checked=true; showLabel=true;
     brightR.value=105; contrastR.value=105;
-    document.getElementById('out').classList.remove('show'); document.getElementById('snippet').textContent=''; lastComposite=null;
+    lastComposite=null;
     applyCount(); sel(null);
   }
   function init(){ panes.forEach(function(p){ p.layout(); }); applyCount(); sel(null); }
