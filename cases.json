@@ -3,6 +3,12 @@
     {
       "name": "입술 필러",
       "cat": "filler",
+      "desc": "벨로테로 0.7cc. 시술 직후",
+      "img": "/assets/cases/case-입술-필러-297525.jpg"
+    },
+    {
+      "name": "입술 필러",
+      "cat": "filler",
       "desc": "레스틸렌 키스 0.4cc 시술직후",
       "img": "/assets/cases/case-입술-필러-124560.jpg"
     },
