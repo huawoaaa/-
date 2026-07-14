@@ -72,7 +72,16 @@
       "name": "입술 필러",
       "cat": "filler",
       "desc": "벨로테로 0.7cc. 시술 직후",
-      "img": "/assets/cases/case-입술-필러-297525.jpg"
+      "photos": [
+        {
+          "image": "/assets/cases/case-입술-필러-081381-1.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-입술-필러-081381-2.jpg",
+          "label": "After"
+        }
+      ]
     },
     {
       "name": "입술 필러",
