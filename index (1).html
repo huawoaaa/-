@@ -1,0 +1,55 @@
+backend:
+  name: git-gateway
+  branch: main          # 저장소 기본 브랜치명이 master이면 master로 바꾸세요
+
+media_folder: "assets/cases"     # 업로드한 사진이 저장되는 폴더
+public_folder: "/assets/cases"   # 사이트에서 불러올 때의 경로
+
+locale: "ko"
+
+collections:
+  - name: "site"
+    label: "사례 관리"
+    files:
+      - name: "cases"
+        label: "시술 사례 목록"
+        file: "cases.json"
+        description: "사례를 추가/수정/삭제한 뒤 저장하면 사이트에 자동 반영됩니다."
+        fields:
+          - label: "사례"
+            name: "cases"
+            label_singular: "사례"
+            widget: "list"
+            summary: "{{fields.name}}"
+            fields:
+              - { label: "시술명", name: "name", widget: "string" }
+              - label: "카테고리"
+                name: "cat"
+                widget: "select"
+                default: "botox"
+                options:
+                  - { label: "보톡스", value: "botox" }
+                  - { label: "필러", value: "filler" }
+                  - { label: "실리프팅", value: "lifting" }
+                  - { label: "색소치료", value: "pigment" }
+                  - { label: "안티에이징", value: "antiaging" }
+                  - { label: "기타", value: "etc" }
+              - { label: "설명", name: "desc", widget: "text", required: false }
+              - label: "사진 (Before / After)"
+                name: "photos"
+                label_singular: "사진"
+                widget: "list"
+                summary: "{{fields.label}}"
+                fields:
+                  - { label: "사진", name: "image", widget: "image" }
+                  - label: "라벨"
+                    name: "label"
+                    widget: "select"
+                    default: "Before"
+                    options:
+                      - "Before"
+                      - "After"
+                      - "정면"
+                      - "측면"
+                      - "3개월 후"
+                      - "6개월 후"
