@@ -1,6 +1,21 @@
 {
   "cases": [
     {
+      "name": "실리프팅",
+      "cat": "lifting",
+      "desc": "풀페이스",
+      "photos": [
+        {
+          "image": "/assets/cases/case-실리프팅-656201-1.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-실리프팅-656201-2.jpg",
+          "label": "After"
+        }
+      ]
+    },
+    {
       "name": "입술 필러",
       "cat": "filler",
       "desc": "벨로테로 1cc, 와이솔루션 1cc",
