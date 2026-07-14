@@ -502,8 +502,10 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .d-header__inner { height: 78px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
 .d-logo { font-size: 1.0625rem; font-weight: 700; letter-spacing: 0.14em; }
 .d-nav { display: flex; gap: 24px; justify-self: center; }
-.d-nav a { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--label-neutral); transition: color .15s; white-space: nowrap; }
-.d-nav a:hover, .d-nav a.on { color: var(--label-normal); }
+.d-nav a { position: relative; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--label-neutral); transition: color .15s; white-space: nowrap; padding-bottom: 4px; }
+.d-nav a:hover { color: var(--label-normal); }
+.d-nav a.on { color: var(--primary-normal); }
+.d-nav a.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 2px; background: var(--primary-normal); border-radius: 2px; }
 .d-utils { justify-self: end; display: flex; align-items: center; gap: 22px; }
 .d-utils a { font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--label-neutral); white-space: nowrap; }
 .d-utils a:hover { color: var(--label-normal); }
