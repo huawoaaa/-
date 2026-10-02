@@ -819,6 +819,18 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .cg-pane .rm{position:absolute;top:8px;right:8px;z-index:5;display:none;width:24px;height:24px;border-radius:50%;border:0;background:rgba(23,23,25,.6);color:#fff;font-size:13px;cursor:pointer;align-items:center;justify-content:center;}
 .cg-pane.filled .rm{display:flex;}
 .cg-ed__hint{font-size:0.78rem;color:var(--label-assistive);margin:8px 0 20px;}
+.cg-one{position:relative;border:1.5px dashed var(--line-normal);border-radius:14px;background:var(--background-alternative);min-height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-top:6px;cursor:pointer;}
+.cg-one.dragover{border-color:var(--primary-normal);}
+.cg-one.filled{cursor:default;border-style:solid;background:#fff;}
+.cg-one__empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:40px;text-align:center;}
+.cg-one__empty .big{font-weight:700;font-size:0.95rem;color:var(--label-normal);}
+.cg-one__empty .sm{font-size:0.8rem;color:var(--label-alternative);}
+.cg-one .pick{margin-top:6px;appearance:none;border:1px solid var(--line-normal);background:#fff;font-family:inherit;font-size:0.8rem;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;color:var(--label-normal);}
+.cg-one img{display:none;width:100%;height:auto;max-height:62vh;object-fit:contain;}
+.cg-one.filled img{display:block;}
+.cg-one.filled .cg-one__empty{display:none;}
+.cg-one .rm{position:absolute;top:10px;right:10px;display:none;width:28px;height:28px;border-radius:50%;border:0;background:rgba(23,23,25,.6);color:#fff;font-size:15px;cursor:pointer;}
+.cg-one.filled .rm{display:block;}
 .cg-ed__act{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
 .cg-out{display:none;margin-top:18px;border:1px solid var(--line-solid-normal);border-radius:12px;overflow:hidden;}
 .cg-out.show{display:block;}
@@ -922,6 +934,19 @@ html, body { max-width: 100%; overflow-x: hidden; }
         </div>
       </div>
       <div class="cg-fld grow" style="margin-bottom:18px;"><label>설명 (선택)</label><input id="fDesc" type="text" placeholder="예: 씹는 근육을 줄여 갸름한 턱선으로."></div>
+      <div class="cg-fld" style="margin-bottom:18px;"><label>올리는 방식</label>
+        <div class="cg-seg" id="modeSeg"><button data-mode="grid" class="on" type="button">칸 나눠 만들기</button><button data-mode="single" type="button">완성된 사진 1장</button></div>
+      </div>
+      <div id="singleMode" hidden>
+        <div class="cg-one" id="oneDrop">
+          <div class="cg-one__empty"><span class="big">비포·애프터 완성 사진</span><span class="sm">끌어다 놓거나 클릭해서 선택</span><button class="pick" type="button" id="onePick">파일 선택</button></div>
+          <img id="onePrev" alt="">
+          <button class="rm" type="button" id="oneRm" aria-label="사진 빼기">×</button>
+          <input type="file" id="oneFile" accept="image/*" hidden>
+        </div>
+        <p class="cg-ed__hint">이미 한 장으로 합쳐 둔 비포·애프터 사진을 <b>자르지 않고 원본 비율 그대로</b> 올립니다. 큰 사진은 가로 2000px로 자동 축소됩니다.</p>
+      </div>
+      <div id="gridMode">
       <div class="cg-row" style="margin-bottom:10px;">
         <div class="cg-fld"><label>사진 개수</label>
           <div class="cg-seg" id="countSeg"><button data-n="1">1</button><button data-n="2" class="on">2</button><button data-n="3">3</button><button data-n="4">4</button><button data-n="5">5</button><button data-n="6">6</button></div>
@@ -941,6 +966,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       </div>
       <div class="cg-stage" id="stage" style="--cols:2;"></div>
       <p class="cg-ed__hint">칸에 사진을 끌어다 놓기 · <b>칸을 클릭해 선택</b>하면 그 사진의 밝기·대비를 따로 조절 · 드래그로 위치 · 슬라이더로 확대 &nbsp;|&nbsp; <b id="selInfo">선택 안 됨</b></p>
+      </div>
       <div class="cg-ed__act">
         <button class="wds-btn wds-btn--lg btn-gold" id="publishBtn" disabled><span>게시</span></button>
       </div>
@@ -1042,7 +1068,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
 
 /* editor */
 (function(){
-  var OUT_W=1200,ratio=1.3333,count=2,showLabel=true,panes=[],selected=null,editingCase=null;
+  var OUT_W=1200,ratio=1.3333,count=2,showLabel=true,panes=[],selected=null,editingCase=null,mode='grid',oneImg=null;
   function filt(s){ return 'brightness('+s.bright+') contrast('+s.contrast+') saturate(1.03)'; }
   var stage=document.getElementById('stage'),editor=document.getElementById('editor');
   var lastComposite=null,lastFilename='';
@@ -1094,7 +1120,8 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
   }
   function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();}
   function active(){ return panes.slice(0,count); }
-  function ready(){ return active().every(function(p){ return p.st.img; }); }
+  function ready(){ if(mode==='single') return !!oneImg; return active().every(function(p){ return p.st.img; }); }
+  function oneCanvas(){ var w=Math.min(2000,oneImg.naturalWidth),h=Math.round(oneImg.naturalHeight*w/oneImg.naturalWidth); var c=document.createElement('canvas'); c.width=w; c.height=h; var x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,w,h); x.drawImage(oneImg,0,0,w,h); return c; }
   function refresh(){ var pb=document.getElementById('publishBtn'); if(pb) pb.disabled=!ready(); }
   function relayoutAll(){ active().forEach(function(p){ p.relayoutKeep(); }); }
   function composite(){
@@ -1143,19 +1170,28 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
           });
         });
       }
-      return up(0,[]).then(function(photos){
+      function upOne(){
+        var c=oneCanvas();
+        return new Promise(function(res){ c.toBlob(function(b){res(b);},'image/jpeg',0.92); }).then(blobToB64).then(function(b64){
+          var fn='case-'+slug(name)+'-'+stamp+'.jpg';
+          return fetch(api+'assets/cases/'+fn,{method:'PUT',headers:hdr,body:JSON.stringify({message:'img '+fn,content:b64})}).then(function(r){ if(!r.ok) throw new Error('이미지 업로드 실패('+r.status+')'); return {img:'/assets/cases/'+fn}; });
+        });
+      }
+      var single=(mode==='single');
+      return (single?upOne():up(0,[]).then(function(ph){ return {photos:ph}; })).then(function(res){ var photos=res.photos;
         return fetch(api+'cases.json',{headers:{Authorization:'Bearer '+token}}).then(function(g){ return g.ok?g.json():null; }).then(function(gj){
           var data={cases:[]}, sha=null;
           if(gj){ sha=gj.sha; try{ data=JSON.parse(decB64(gj.content)); }catch(e){} }
           if(!data.cases) data.cases=[];
-          var rec={name:name,cat:cat,desc:desc,photos:photos}, done=false;
+          var rec=single?{name:name,cat:cat,desc:desc,img:res.img}:{name:name,cat:cat,desc:desc,photos:photos}, done=false;
           if(isEdit){ var key=caseFirstImg(target); if(key){ for(var k=0;k<data.cases.length;k++){ if(caseFirstImg(data.cases[k])===key){ data.cases[k]=rec; done=true; break; } } } }
           if(!done) data.cases.unshift(rec);
           var body={message:(isEdit?'edit case ':'add case ')+name,content:encB64(JSON.stringify(data,null,2))}; if(sha) body.sha=sha;
           return fetch(api+'cases.json',{method:'PUT',headers:hdr,body:JSON.stringify(body)}).then(function(r2){
             if(!r2.ok) throw new Error('목록 저장 실패('+r2.status+')');
-            var localPhotos=aps.map(function(p){ try{ return {image:p.render().toDataURL('image/jpeg',0.85),label:(p.tag.value||'').trim()}; }catch(e){ return {image:'',label:(p.tag.value||'').trim()}; } });
-            var lr={name:name,cat:cat,desc:desc,photos:localPhotos};
+            var lr;
+            if(single){ lr={name:name,cat:cat,desc:desc,img:oneCanvas().toDataURL('image/jpeg',0.85)}; }
+            else { var localPhotos=aps.map(function(p){ try{ return {image:p.render().toDataURL('image/jpeg',0.85),label:(p.tag.value||'').trim()}; }catch(e){ return {image:'',label:(p.tag.value||'').trim()}; } }); lr={name:name,cat:cat,desc:desc,photos:localPhotos}; }
             if(isEdit){ var li=CASES.indexOf(target); if(li>=0) CASES[li]=lr; else CASES.unshift(lr); } else CASES.unshift(lr);
             window.__renderGallery(); editor.classList.remove('open'); editingCase=null;
             alert((isEdit?'수정':'게시')+'되었습니다. 1~2분 뒤 사이트에 반영됩니다.');
@@ -1167,6 +1203,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
   function openEditor(c){
     resetEditor(); editingCase=c;
     document.getElementById('fName').value=c.name||''; document.getElementById('fCat').value=c.cat||'botox'; document.getElementById('fDesc').value=c.desc||'';
+    if(c.img && !(c.photos&&c.photos.length)){ setMode('single'); loadOneURL(c.img); var t1=document.querySelector('.cg-ed__bar h3'); if(t1) t1.textContent='사례 수정'; editor.classList.add('open'); return; }
     var imgs=[];
     if(c.photos&&c.photos.length) imgs=c.photos.map(function(p){return {image:p.image,label:p.label||''};});
     else if(c.img) imgs=[{image:c.img,label:''}];
@@ -1179,6 +1216,20 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
   }
   window.__openEditor=openEditor;
   document.getElementById('publishBtn').onclick=publishCase;
+  var oneDrop=document.getElementById('oneDrop'),onePrev=document.getElementById('onePrev'),oneFile=document.getElementById('oneFile');
+  function setOne(img){ oneImg=img; onePrev.src=img.src; oneDrop.classList.add('filled'); refresh(); }
+  function clearOne(){ oneImg=null; onePrev.removeAttribute('src'); oneDrop.classList.remove('filled'); oneFile.value=''; refresh(); }
+  function loadOneFile(f){ if(!f||!/^image\//.test(f.type))return; var r=new FileReader(); r.onload=function(){ var img=new Image(); img.onload=function(){ setOne(img); }; img.src=r.result; }; r.readAsDataURL(f); }
+  function loadOneURL(u){ var img=new Image(); img.crossOrigin='anonymous'; img.onload=function(){ setOne(img); }; img.src=u; }
+  document.getElementById('onePick').onclick=function(e){ e.stopPropagation(); oneFile.click(); };
+  oneDrop.addEventListener('click',function(e){ if(!oneImg && !e.target.closest('button')) oneFile.click(); });
+  oneFile.onchange=function(){ if(oneFile.files[0]) loadOneFile(oneFile.files[0]); };
+  document.getElementById('oneRm').onclick=function(e){ e.stopPropagation(); clearOne(); };
+  oneDrop.addEventListener('dragover',function(e){ e.preventDefault(); oneDrop.classList.add('dragover'); });
+  oneDrop.addEventListener('dragleave',function(){ oneDrop.classList.remove('dragover'); });
+  oneDrop.addEventListener('drop',function(e){ e.preventDefault(); oneDrop.classList.remove('dragover'); var f=e.dataTransfer.files[0]; if(f) loadOneFile(f); });
+  function setMode(m){ mode=m; document.querySelectorAll('#modeSeg button').forEach(function(b){ b.classList.toggle('on',b.getAttribute('data-mode')===m); }); document.getElementById('gridMode').hidden=(m!=='grid'); document.getElementById('singleMode').hidden=(m!=='single'); if(m==='grid') requestAnimationFrame(relayoutAll); refresh(); }
+  document.getElementById('modeSeg').onclick=function(e){ var b=e.target.closest('button'); if(b) setMode(b.getAttribute('data-mode')); };
   var _dlUnused=function(){ if(!lastComposite)return; lastComposite.toBlob(function(b){ var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=lastFilename; a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);},1000); },'image/jpeg',0.9); };
   var _cpUnused=function(){ var t=document.getElementById('snippet').textContent; if(navigator.clipboard) navigator.clipboard.writeText(t); var b=this; b.textContent='복사됨 ✓'; setTimeout(function(){ b.textContent='코드 복사'; },1500); };
   var _pvUnused=function(){ if(!ready())return; var name=document.getElementById('fName').value.trim()||'시술 사례',cat=document.getElementById('fCat').value,desc=document.getElementById('fDesc').value.trim(); CASES.push({name:name,cat:cat,desc:desc,img:composite().toDataURL('image/jpeg',0.9),_editable:true}); window.__renderGallery(); editor.classList.remove('open'); };
@@ -1210,6 +1261,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
     document.getElementById('labelToggle').checked=true; showLabel=true;
     brightR.value=105; contrastR.value=105;
     lastComposite=null; editingCase=null;
+    clearOne(); setMode('grid');
     applyCount(); sel(null);
   }
   function init(){ panes.forEach(function(p){ p.layout(); }); applyCount(); sel(null); }
