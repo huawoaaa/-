@@ -1,6 +1,29 @@
 {
   "cases": [
     {
+      "name": "브이로 어드밴스, 이중턱 실리프팅, 가로확장 입술필러",
+      "cat": "lifting",
+      "desc": "",
+      "photos": [
+        {
+          "image": "/assets/cases/case-브이로-어드밴스-이중턱-실리프팅-가로확장-입술필러-792967-1.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-브이로-어드밴스-이중턱-실리프팅-가로확장-입술필러-792967-2.jpg",
+          "label": "After"
+        },
+        {
+          "image": "/assets/cases/case-브이로-어드밴스-이중턱-실리프팅-가로확장-입술필러-792967-3.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-브이로-어드밴스-이중턱-실리프팅-가로확장-입술필러-792967-4.jpg",
+          "label": "After"
+        }
+      ]
+    },
+    {
       "name": "시술 사례",
       "cat": "botox",
       "desc": "",
