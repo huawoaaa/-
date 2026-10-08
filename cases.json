@@ -1,6 +1,29 @@
 {
   "cases": [
     {
+      "name": "시술 사례",
+      "cat": "botox",
+      "desc": "",
+      "photos": [
+        {
+          "image": "/assets/cases/case-시술-사례-723591-1.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-시술-사례-723591-2.jpg",
+          "label": "After"
+        },
+        {
+          "image": "/assets/cases/case-시술-사례-723591-3.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-시술-사례-723591-4.jpg",
+          "label": "After"
+        }
+      ]
+    },
+    {
       "name": "입술 필러",
       "cat": "filler",
       "desc": "와이솔루션 1.5cc",
