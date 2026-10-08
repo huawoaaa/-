@@ -3,6 +3,29 @@
     {
       "name": "브이로 어드밴스, 이중턱 실리프팅, 가로확장 입술필러",
       "cat": "lifting",
+      "desc": "벨로테로 1cc",
+      "photos": [
+        {
+          "image": "/assets/cases/case-브이로-어드밴스-이중턱-실리프팅-가로확장-입술필러-922390-1.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-브이로-어드밴스-이중턱-실리프팅-가로확장-입술필러-922390-2.jpg",
+          "label": "After"
+        },
+        {
+          "image": "/assets/cases/case-브이로-어드밴스-이중턱-실리프팅-가로확장-입술필러-922390-3.jpg",
+          "label": "Before"
+        },
+        {
+          "image": "/assets/cases/case-브이로-어드밴스-이중턱-실리프팅-가로확장-입술필러-922390-4.jpg",
+          "label": "After"
+        }
+      ]
+    },
+    {
+      "name": "브이로 어드밴스, 이중턱 실리프팅, 가로확장 입술필러",
+      "cat": "lifting",
       "desc": "",
       "photos": [
         {
