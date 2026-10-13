@@ -783,6 +783,21 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .d-pop__foot button { border: 0; background: none; font-family: inherit; font-size: 0.875rem; font-weight: 600; color: var(--label-normal); cursor: pointer; padding: 4px 2px; }
 .d-pop__foot button:hover { color: var(--primary-normal); }
 </style>
+<style id="nav-price">
+@supports (overflow:clip){html,body{overflow-x:clip!important}}
+@supports not (overflow:clip){html{overflow-x:hidden}body{overflow-x:visible!important}}
+html{scroll-padding-top:var(--hh,100px)}
+.d-sub{border-top:1px solid var(--line-alternative)}
+.d-sub__in{display:flex;align-items:center;gap:28px;height:48px}
+.d-sub .t{font-size:.75rem;font-weight:600;letter-spacing:.14em;color:var(--label-alternative);text-transform:uppercase;white-space:nowrap}
+.d-sub a{position:relative;display:flex;align-items:center;height:100%;font-size:.9375rem;font-weight:500;color:var(--label-neutral);white-space:nowrap}
+.d-sub a:hover{color:var(--label-normal)}
+.d-sub a.on{color:var(--label-normal);font-weight:600}
+.d-sub a.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--label-normal);border-radius:2px}
+@media (max-width:860px){.d-nav{gap:18px;overflow-x:auto;justify-content:flex-start;scrollbar-width:none}.d-nav::-webkit-scrollbar{display:none}.d-nav a:first-child{margin-left:auto}.d-nav a:last-child{margin-right:auto}.d-sub__in{height:44px;justify-content:center;gap:32px}.d-sub .t{display:none}}
+@media (max-width:1160px){.d-utils{flex-direction:column;align-items:flex-end;gap:2px}.d-utils a,.d-utils a.util-2f{display:block;font-size:.75rem;letter-spacing:.06em;line-height:1.5}}
+.sn{display:inline-block;max-width:100%}
+</style>
 </head>
 <body class="d-body">
 
@@ -953,6 +968,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     <div class="d-foot__links">
       <a href="madi.html">마디</a>
       <a href="goun.html">고운</a>
+      <a href="price.html">시술·가격</a>
       <a href="event.html">이벤트</a>
       <a href="#visit">오시는 길</a>
     </div>
@@ -986,6 +1002,21 @@ html, body { max-width: 100%; overflow-x: hidden; }
   if(!hide){ pop.classList.add('on'); document.body.style.overflow='hidden'; }
   pop.addEventListener('click',function(e){ if(e.target.closest('[data-pop-close]')) close(); });
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+})();
+</script>
+<script id="sentence-wrap">
+(function(){
+var B=/([.!?])\s+(?=\S)/g,T=/[.!?]\s+\S/;
+function run(){document.querySelectorAll('p,dd,li,.sub,.ds,h2,h3').forEach(function(el){
+if(el.dataset.sn||!T.test(el.textContent)||el.closest('nav,.d-pop,script,style')||el.querySelector('p,ul,ol,div,li,dl,table'))return;
+el.dataset.sn='1';
+[].slice.call(el.childNodes).forEach(function(n){
+if(n.nodeType!==3||!T.test(n.nodeValue))return;
+var parts=n.nodeValue.replace(B,'$1\u0000').split('\u0000'),f=document.createDocumentFragment();
+parts.forEach(function(s,i){if(i)f.appendChild(document.createTextNode(' '));if(!s.trim()){f.appendChild(document.createTextNode(s));return;}var sp=document.createElement('span');sp.className='sn';sp.textContent=s;f.appendChild(sp);});
+n.parentNode.replaceChild(f,n);});});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+window.__snWrap=run;
 })();
 </script>
 </body>
