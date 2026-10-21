@@ -822,6 +822,20 @@ body.d-body,body{background:var(--r-bg)}
 .r-pr h3{font-family:var(--r-serif);font-weight:400;font-size:1.25rem;margin:0 0 12px}
 .r-pr p{color:var(--r-sub);font-size:.9375rem;line-height:1.75;margin:0}
 @media (max-width:860px){.r-pr{grid-template-columns:1fr;gap:32px;margin-top:48px}}
+.r-feat{background:#F1ECE3;margin-top:112px;padding-block:88px}
+.r-feat .fin{display:grid;grid-template-columns:6fr 6fr;gap:56px;align-items:start}
+.r-feat img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(.75) sepia(.1)}
+.r-feat h2{font-family:var(--r-serif);font-weight:300;font-size:2.75rem;line-height:1.3;margin:0 0 20px}
+.r-feat .ld{color:var(--r-sub);font-size:1.0625rem;line-height:1.85;margin:0 0 32px}
+.r-feat .rows>a{display:grid;grid-template-columns:9rem 1fr auto;gap:16px;align-items:baseline;padding-block:18px;border-top:1px solid rgba(23,23,25,.14);color:inherit}
+.r-feat .rows>a:last-child{border-bottom:1px solid rgba(23,23,25,.14)}
+.r-feat .rows b{font-weight:600;font-size:1.0625rem}
+.r-feat .rows span{color:var(--r-sub);font-size:.9375rem;line-height:1.6}
+.r-feat .rows i{font-style:normal;font-size:.875rem;color:var(--r-gold-d)}
+.r-feat .rows>a:hover i{text-decoration:underline}
+.r-feat .meta{margin-top:20px;font-size:.875rem;color:var(--r-sub)}
+.r-feat .more{display:inline-block;margin-top:28px;font-size:.9375rem;border-bottom:1px solid var(--r-gold);padding-bottom:3px}
+@media (max-width:860px){.r-feat{margin-top:72px;padding-block:56px}.r-feat .fin{grid-template-columns:1fr;gap:32px}.r-feat h2{font-size:2rem}.r-feat .rows>a{grid-template-columns:1fr auto}.r-feat .rows span{grid-column:1/-1;grid-row:2}}
 .r-sh{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--r-ink);padding-bottom:18px}
 .r-sh h3{font-family:var(--r-serif);font-weight:400;font-size:1.75rem;margin:0}
 .r-sh a{font-size:.875rem;color:var(--r-gold-d);border-bottom:1px solid transparent}
@@ -901,6 +915,23 @@ body.d-body,body{background:var(--r-bg)}
   <div><h3>과하지 않은 자연스러움</h3><p>유행을 좇기보다 자연스러움을 우선합니다.</p></div>
 </div></section>
 
+<!-- FEATURED: 실리프팅 -->
+<section class="r-feat"><div class="wrap wrap-wide fin">
+  <img class="r-rv" src="assets/goun-thread.jpg" alt="녹는 실(PDO) 리프팅 실 근접 사진" width="1280" height="960" loading="lazy">
+  <div class="r-rv">
+    <div class="r-fl">고운의 대표 시술</div>
+    <h2>실리프팅</h2>
+    <p class="ld">녹는 실을 피부 아래에 걸어 처진 부위를 끌어올리는 주사형 리프팅입니다. 얼굴형과 처진 방향을 보고, 실의 종류·방향·개수를 원장이 직접 설계합니다.</p>
+    <div class="rows">
+      <a href="price.html#thread"><b>리프팅 실</b><span>이마·눈썹 · 팔자 · 이중턱 · 턱선</span><i>가격 →</i></a>
+      <a href="price.html#thread-package"><b>부위별 패키지</b><span>하안부 · 중하안부 · 풀페이스, 3개월 내 무상 리터치 1회</span><i>가격 →</i></a>
+      <a href="price.html#volume-thread"><b>볼륨 실</b><span>눈밑 · 팔자 · 풀페이스, 꺼진 부위를 채우는 스프링형 실</span><i>가격 →</i></a>
+    </div>
+    <p class="meta">사용하는 실 · 민트 · 콘셀티나 · 포르테픽스 · 에피티콘</p>
+    <a class="more" href="cases.html">실리프팅 전후사진 보기 →</a>
+  </div>
+</div></section>
+
 <!-- LINEUP -->
 <section class="wrap wrap-wide r-sec r-rv">
   <div class="r-sh"><h3>보톡스</h3><a href="price.html#botox">가격 보기 →</a></div>
@@ -951,7 +982,6 @@ body.d-body,body{background:var(--r-bg)}
 <section class="wrap wrap-wide r-sec r-rv">
   <div class="r-sh"><h3>그 밖의 시술</h3><a href="price.html">가격 보기 →</a></div>
   <div class="r-list">
-    <div><b>실리프팅</b><p>민트 · 에피티콘 · 콘셀티나</p></div>
     <div><b>색소치료</b><p>기미 · 잡티 · 주근깨 · 색소침착 레이저 치료</p></div>
     <div><b>안티에이징</b><p>악센토 · 루비레이저 · 코어페이셜 · N-gine · 디오레듀얼</p></div>
   </div>
