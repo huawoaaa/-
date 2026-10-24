@@ -26,15 +26,6 @@
 @import url('https://cdn.jsdelivr.net/gh/wanteddev/wanted-sans@v1.0.3/packages/wanted-sans/fonts/webfonts/variable/split/WantedSansVariable.min.css');
 
 /* ---- UI typeface: Pretendard (self-hosted, uploaded) -------------------- */
-@font-face { font-family:'Pretendard'; font-weight:100; font-style:normal; font-display:swap; src:url('fonts/Pretendard-Thin.otf') format('opentype'); }
-@font-face { font-family:'Pretendard'; font-weight:200; font-style:normal; font-display:swap; src:url('fonts/Pretendard-ExtraLight.otf') format('opentype'); }
-@font-face { font-family:'Pretendard'; font-weight:300; font-style:normal; font-display:swap; src:url('fonts/Pretendard-Light.otf') format('opentype'); }
-@font-face { font-family:'Pretendard'; font-weight:400; font-style:normal; font-display:swap; src:url('fonts/Pretendard-Regular.otf') format('opentype'); }
-@font-face { font-family:'Pretendard'; font-weight:500; font-style:normal; font-display:swap; src:url('fonts/Pretendard-Medium.otf') format('opentype'); }
-@font-face { font-family:'Pretendard'; font-weight:600; font-style:normal; font-display:swap; src:url('fonts/Pretendard-SemiBold.otf') format('opentype'); }
-@font-face { font-family:'Pretendard'; font-weight:700; font-style:normal; font-display:swap; src:url('fonts/Pretendard-Bold.otf') format('opentype'); }
-@font-face { font-family:'Pretendard'; font-weight:800; font-style:normal; font-display:swap; src:url('fonts/Pretendard-ExtraBold.otf') format('opentype'); }
-@font-face { font-family:'Pretendard'; font-weight:900; font-style:normal; font-display:swap; src:url('fonts/Pretendard-Black.otf') format('opentype'); }
 
 :root {
   /* ===== ATOMIC SCALES ================================================== */
@@ -848,6 +839,12 @@ body.d-body,body{background:var(--r-bg)}
 .r-cta{margin-top:72px;padding-block:56px}
 .r-visit{gap:40px}
 }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style id="readability">
+/* 가독성(2026-10-24): 13px였던 메뉴·전화·푸터 키움. 폰 메뉴는 그대로 */
+@media (min-width:861px){ .d-nav a{font-size:.9375rem} .d-utils a,.d-utils a.util-2f{font-size:.875rem} }
+.r-foot{font-size:.9375rem} .d-ev__fine{font-size:.875rem}
 </style>
 </head>
 <body class="d-body">
