@@ -1117,7 +1117,7 @@ var CAT_LABEL={botox:'보톡스',filler:'필러',lifting:'실리프팅',pigment:
       var media;
       if(c.photos&&c.photos.length){
         var n=c.photos.length, cols=n<=3?n:(n===4?2:3);
-        media='<div class="cg-card__grid" style="grid-template-columns:repeat('+cols+',1fr)">'+c.photos.map(function(ph){ var af=((ph.label||'')+'').toLowerCase()==='after'; return '<div class="cg-card__cell">'+(ph.image?'<img src="'+ph.image+'" loading="lazy" alt="">':'')+(ph.label?'<span class="lab'+(af?' after':'')+'">'+ph.label+'</span>':'')+'</div>'; }).join('')+'</div>';
+        media='<div class="cg-card__grid" style="grid-template-columns:repeat('+cols+',1fr)">'+c.photos.map(function(ph){ var af=((ph.label||'')+'').toLowerCase()==='after'; return '<div class="cg-card__cell">'+(ph.image?'<img src="'+ph.image+'" loading="lazy" alt="'+((c.name||'시술')+' '+(ph.label||'')+' 사진').replace(/"/g,'')+'">':'')+(ph.label?'<span class="lab'+(af?' after':'')+'">'+ph.label+'</span>':'')+'</div>'; }).join('')+'</div>';
       } else {
         media='<div class="cg-card__media"><img src="'+c.img+'" alt="'+(c.name||'')+'" loading="lazy"></div>';
       }
