@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
 Sitemap: https://madigoun.com/sitemap.xml
+
+#DaumWebMasterTool:fa8c98a4a931c1da7d86d02e8be4f31abe102592d398e109786972c5f3339224:9OXzxfMP1b1VGCOsL/bJCQ==
